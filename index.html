@@ -132,6 +132,18 @@
             images.forEach(image => updateImageSize(image));
         });
 
+        // 파일명을 변경하는 함수
+        function getResizedFilename(originalFilename, newWidth, newHeight) {
+            const parts = originalFilename.split('_');
+            const lastPart = parts.pop();  // 마지막 부분 추출
+            const sizePattern = /\d{3,4}-\d{3,4}/;  // '숫자-숫자' 패턴
+
+            // 기존 크기 (숫자-숫자) 부분을 찾아서 새로운 크기로 대체
+            const newFilename = parts.join('_') + `_${newWidth}-${newHeight}`;
+
+            return newFilename;
+        }
+
         // 이미지 저장 버튼 클릭 이벤트
         saveImagesButton.addEventListener('click', () => {
             uploadedImages.forEach(({ file, imgElement }) => {
@@ -146,10 +158,12 @@
                 canvas.height = height;
                 ctx.drawImage(imgElement, 0, 0, width, height);
 
+                // 파일명 변경
+                const filename = getResizedFilename(file.name, width, height);
+
                 // Blob으로 변환하여 다운로드 링크 생성
                 canvas.toBlob((blob) => {
                     const link = document.createElement('a');
-                    const filename = file.name;  // 원본 파일명 그대로 사용
                     link.href = URL.createObjectURL(blob);
                     link.download = filename;
                     link.click();
